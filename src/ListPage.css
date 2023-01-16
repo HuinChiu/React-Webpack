@@ -1,0 +1,41 @@
+body{
+    font-size: 16px;
+}
+.input{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+.input-item{
+    width:150px;
+    height: 25px;
+    padding: 5px 10px;
+    margin:10px;
+}
+.msg{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+.msg-item{
+    width:200px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 10px;
+}
+.msg-item__msg{
+    font-size: 20px;
+}
+.msg-item__btn{
+    font-size: 16px;
+    padding: 5px 10px;
+}
+.back-btn{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
