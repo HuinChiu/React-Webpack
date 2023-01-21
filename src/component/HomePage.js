@@ -1,9 +1,13 @@
 import "../index.css"
 import React from "react";
 import ListPage from "./ListPage";
+import { Routes,Route,Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+
 
 function HomePage(props) {
   const {setCurrentPage} =props;
+  // const navigate=useNavigate();
   return (
     <>
       <div className="title">
@@ -13,7 +17,10 @@ function HomePage(props) {
         <div className="header-item">歡迎光臨我的頁面</div>
       </div>
       <div className="main">
-        <button className="start-btn" onClick={()=> setCurrentPage("ListPage")}>點此開始</button>
+        <Link to ="/list">
+        <button className="start-btn">點此開始</button>
+
+        </Link>
       </div>
     </>
 

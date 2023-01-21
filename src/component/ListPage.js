@@ -1,8 +1,12 @@
 import "../ListPage.css"
 import React from "react";
 import { useState } from "react";
+import { Routes,Route,Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import HomePage from "./HomePage";
 
-const TodoList = ({ list }) => (
+
+const TodoList = ({ list,deleteTask }) => (
 
     <div>
     {
@@ -10,7 +14,7 @@ const TodoList = ({ list }) => (
             return (
                 <div className="msg-item" key={index}>
                     <div className="msg-item__msg">{item}</div>
-                    <button className="msg-item__btn" onClick={deleteTask} item={item}>刪除</button>
+                    <button className="msg-item__btn" onClick={() => deleteTask(item)} >刪除</button>
                 </div>
 
 
@@ -42,21 +46,32 @@ const Control = ({ onAdd }) => { //props.onAdd 傳入control
 
 function ListPage({ setCurrentPage }){
     // {* todolist目前無任何資料*}
+    // const navigate=useNavigate();
     const [list, setList] = useState([]);
 
     const onAdd =(value)=>{
         setList([...list,value]);
     }
+    const deleteTask=(item)=>{
+        let index=list.indexOf(item)
+        if(index > -1){
+            let newList=list.splice(index,1)
+            console.log(list)
+            setList([...list])
+        }
 
+    }
     return(
         <>
             <Control onAdd={onAdd}></Control>
             <hr></hr>
             <div className="msg">
-                <TodoList list={list}></TodoList>
+                <TodoList list={list} deleteTask={deleteTask}></TodoList>
             </div>
             <div className="back-btn">
-                <button className="start-btn" onClick={()=> setCurrentPage("HomePage")}>返回首頁</button>
+                <Link to ="/">
+                <button className="start-btn">返回首頁</button>
+                </Link>
             </div>
         </>
     );
