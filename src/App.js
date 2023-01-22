@@ -1,6 +1,6 @@
 import React from "react";
 import {useState} from 'react';
-import { Routes, Route, Link } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import HomePage from "./component/HomePage";
 import ListPage from "./component/ListPage";
 
