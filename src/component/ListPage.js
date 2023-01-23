@@ -1,5 +1,5 @@
 import "../ListPage.css"
-import React from "react";
+import React, { useEffect } from "react";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
@@ -7,47 +7,31 @@ import {
     getDoc,
     getDocs,
     collection,
+    deleteDoc,
+    doc,
+    onSnapshot
 } from "firebase/firestore";
 import {db} from "./firestore";
 
 const todoListCollection=collection(db, "TodoList");
 
-// const TodoList = ({deleteTask,list,querySnapshot}) => (
-//     <div>
-//     {
-        
-//         list.map((item, index) => {
-//             return (
-//                 <div className="msg-item" key={index}>
-//                     <div className="msg-item__msg">{item}</div>
-//                     <button className="msg-item__btn" onClick={() => deleteTask(item)} >刪除</button>
-//                 </div>
+const TodoList = ({msgList,deleteTask}) => {
 
-
-//             );
-//         })
-//     }
-//     </div>
-// );
-const TodoList = ({deleteTask,list,querySnapshot}) => (
-    const query= querySnapshot()
-
-    query.forEach(doc => {
-        console.log(doc.id, doc.data());
-        return (
-            <div className="msg-item" key={doc.id}>
-                <div className="msg-item__msg">{doc.data()}</div>
-                <button className="msg-item__btn" onClick={() => deleteTask(item)} >刪除</button>
+    console.log(msgList)
+    return(
+            <div>
+                {msgList.map((item,index)=>(
+                    <div className="msg-item" key={item.id}>
+                    <div className="msg-item__msg">{item.msg}</div>
+                    <button className="msg-item__btn" onClick={() => deleteTask(item.id,index)} >刪除</button>
+                    </div>
+                ))}
             </div>
+    )
 
-
-        );
-    })
-
-);
-
+};
 //建立表單
-const Control = ({ onAdd }) => { //props.onAdd 傳入control
+const Control = ({onAdd, msgList}) => { //props.onAdd 傳入control
 
     const [value, setValue] = useState('');//初始化input內是空的
 
@@ -55,17 +39,25 @@ const Control = ({ onAdd }) => { //props.onAdd 傳入control
         setValue(e.target.value);//獲取input內的值放進value
     }
 
+    // const addItem = (e) => {
+    //     onAdd(value);//將value傳到setlist
+    //     setValue('');//將input清空
+    // }
+
     const AddTodo=async ({e})=>{
         try {
-            await addDoc(todoListCollection, {
+            // onAdd(value);//將value傳到setlist
+            // setValue('');//將input清空
+            const docRef=await addDoc(todoListCollection, {
                 msg:value
             });
+            const record={"id":docRef.id,"msg":value}
+            onAdd(record)
             setValue('');//將input清空
-          } catch (err) {
+        } catch (err) {
             console.error("Error: ", err);
-          }
+        }
     }
-
     return (
         <div className="input">
             <input className="input-item" value={value} onChange={onChange}/>
@@ -75,37 +67,39 @@ const Control = ({ onAdd }) => { //props.onAdd 傳入control
 };
 
 
-function ListPage({ setCurrentPage }){
-    const [list, setList] = useState([]);
-
-    const onAdd =(value)=>{
-        setList([...list,value]);
-    }
-    const deleteTask=(item)=>{
-        let index=list.indexOf(item)
-        if(index > -1){
-            let newList=list.splice(index,1)
-            console.log(list)
-            setList([...list])
-        }
-
-    }
+function ListPage({}){
+    const [msgList, setmsgList] = useState([]);
     async function querySnapshot(){
-            const query=await getDocs(todoListCollection);
-            console.log(query)
-            query.forEach(doc => {
-                console.log(doc.id, doc.data());
-              });
-            return query
+        const query=await getDocs(todoListCollection);
+        query.forEach((doc)=>{
+            setmsgList(function(msgList){
+                return[
+                    ...msgList,{"id":doc.id,"msg":doc.data().msg}
+                ]
+            })
+            })
+    }
+    useEffect(() => {
+        querySnapshot();
+      }, []);
+
+    const deleteTask=async(id, index)=>{
+        await deleteDoc(doc(db,"TodoList",id));
+        let newList=msgList.splice(index,1)
+        setmsgList([...msgList])
+        }
+    const onAdd =(value)=>{
+        setmsgList([...msgList,value]);
+        console.log(msgList)
     }
 
 
     return(
         <>
-            <Control onAdd={onAdd}></Control>
+            <Control  onAdd={onAdd} msgList={msgList}></Control>
             <hr></hr>
             <div className="msg">
-                <TodoList list={list} deleteTask={deleteTask} querySnapshot={querySnapshot}></TodoList>
+                <TodoList msgList={msgList} querySnapshot={querySnapshot} deleteTask={deleteTask}></TodoList>
             </div>
             <div className="back-btn">
                 <Link to ="/">
